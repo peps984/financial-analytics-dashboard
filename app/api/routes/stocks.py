@@ -5,6 +5,7 @@ from typing import List, Optional
 from app.core.database import get_db
 from app.schemas.stock import StockPriceCreate, StockPriceResponse
 from app.crud.stock import create_stock_price, get_stock_prices, get_stock_price_by_id
+from app.services.ingestion import ingest_stock_data
 
 router = APIRouter(prefix="/stocks", tags=["stocks"])
 
@@ -22,3 +23,8 @@ def get_stock_price(stock_id: int, db: Session = Depends(get_db)):
     if not stock:
         raise HTTPException(status_code=404, detail="Stock price not found")
     return stock
+
+@router.post("/ingest/{symbol}")
+def ingest_stock(symbol: str, db: Session = Depends(get_db)):
+    result = ingest_stock_data(db, symbol)
+    return result
